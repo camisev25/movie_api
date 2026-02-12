@@ -1,0 +1,25 @@
+{
+  "name": "movie_api",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/camisev25/movie_api#readme",
+  "bugs": {
+    "url": "https://github.com/camisev25/movie_api/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/camisev25/movie_api.git"
+  },
+  "license": "ISC",
+  "author": "Camila Sevalho",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "express": "^5.2.1"
+  }
+}
