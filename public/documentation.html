@@ -5,7 +5,96 @@
     <title>API Documentation</title>
   </head>
   <body>
-    <h1>Movie API Documentation</h1>
-    <p>Describe your endpoints here.</p>
+    <h1>Film API Documentation</h1>
+
+    <table border="1" cellpadding="8" cellspacing="0">
+      <thead>
+        <tr>
+          <th>Request</th>
+          <th>URL</th>
+          <th>Description</th> 
+          <th>URL Parameters</th> 
+          <th>Request Body</th>
+          <th>Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GET</td>
+          <td>/films</td>
+          <td>Returns a list of all films.</td>
+          <td>None</td> 
+          <td>None</td> 
+          <td>Plain text (placeholder): "This will return a list of all films". Later: JSON array of film objects.</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/films/:title</td>
+          <td>Returns data about a single film by title.</td>
+          <td><code>:title</code> – a single film by title (string).</td> 
+          <td>None</td> 
+          <td>Plain text (placeholder). Later: JSON object with description, genre, director, image URL, featured.</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/genres/:title</td>
+          <td>Returns data about a genre by title.</td>
+          <td><code>:title</code> – the film genre by title (string).</td> 
+          <td>None</td> 
+          <td>Plain text (placeholder). Later: JSON object with title and description. </td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/directors/:name</td>
+          <td>Returns data about a director by name.</td>
+          <td><code>:name</code> – the director name (string)</td> 
+          <td>None</td>
+          <td>Plain text (placeholder). Later: Returns a JSON object with data about a director (bio, birth year, death year).</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/users</td>
+          <td>Allows a new user to register</td>
+          <td>None</td>
+          <td>JSON (later), e.g.: <code>{"username": "camila", "email": "camila@example.com"}</code></td> 
+          <td>Plain text (placeholder). Later: returns a JSON object with the created user data.</td>
+        </tr>
+        <tr>
+          <td>PUT</td>
+          <td>/users/:username</td>
+          <td>Updates existing user's info.</td> 
+          <td><code>:username</code> – current username</td> 
+          <td>JSON (later), e.g.: <code>{"username": "newName"}</code></td> 
+          <td>Plain text (placeholder). Later: JSON object with updated user data.</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/users/:username/films/:filmId</td>
+          <td>Adds a film to the user's list of favorites.</td>
+          <td> <code>:username</code> – user’s username<br /> 
+            <code>:movieId</code> – movie ID 
+          </td>
+          <td>None (for now).</td> <td>Plain text (placeholder). Later: confirmation message or updated user data.</td>
+        </tr>
+        <tr>
+          <td>DELETE</td>
+          <td>/users/:username/films/:filmId</td>
+          <td>Removes a film from the user's list of favorites.</td>
+          <td> <code>:username</code> – user’s username<br /> 
+            <code>:movieId</code> – movie ID 
+          </td> 
+          <td>None</td> 
+          <td>Plain text (placeholder). Later: confirmation message.</td>
+        </tr>
+        <tr>
+          <td>DELETE</td>
+          <td>/users/:username</td>
+          <td>Deregisters an existing user.</td>
+          <td><code>:username</code> – user’s username</td> 
+          <td>None</td> 
+          <td>Plain text (placeholder). Later: confirmation message that the user has been removed.</td>
+        </tr>
+      </tbody>
+    </table>
   </body>
 </html>
