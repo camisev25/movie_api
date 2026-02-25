@@ -1,6 +1,12 @@
+const passport = require('passport');
+require('./passport');
+
 const express = require('express');
 const app = express();
+
 app.use(express.json());
+
+let auth = require('./auth')(app);
 
 const mongoose = require('mongoose');
 const Models = require('./models.js');
@@ -8,10 +14,12 @@ const Models = require('./models.js');
 const Movies = Models.Movie;
 const Users = Models.User;
 
+const bcrypt = require('bcrypt');
+
 mongoose.connect('mongodb://127.0.0.1:27017/films');
 
 //Returns all films//
-app.get('/movies', async (req, res) => {
+app.get('/movies', passport.authenticate('jwt', { session: false}), async (req, res) => {
     try { 
         const movies = await Movies.find(); 
         res.json(movies); 
@@ -22,7 +30,7 @@ app.get('/movies', async (req, res) => {
 });
 
 //Returns a single film by title.//
-app.get('/movies/:title', async (req, res) => {
+app.get('/movies/:title', passport.authenticate('jwt', { session: false}), async (req, res) => {
     try { 
         const movie = await Movies.findOne({ Title: req.params.title }); 
         if (!movie) return res.status(404).send('Movie not found'); 
@@ -33,7 +41,7 @@ app.get('/movies/:title', async (req, res) => {
 });
 
 //Returns genre info by name.//
-app.get('/genres/:name', async (req, res) => {
+app.get('/genres/:name', passport.authenticate('jwt', { session: false}), async (req, res) => {
   try {
     const movie = await Movies.findOne({ 'Genre.Name': req.params.name });
     if (!movie) return res.status(404).send('Genre not found');
@@ -45,7 +53,7 @@ app.get('/genres/:name', async (req, res) => {
 });
 
 //Returns director info by name.//
-app.get('/directors/:name', async (req, res) => {
+app.get('/directors/:name', passport.authenticate('jwt', { session: false}), async (req, res) => {
   try {
     const movie = await Movies.findOne({ 'Director.Name': req.params.name });
     if (!movie) return res.status(404).send('Director not found');
@@ -64,9 +72,11 @@ app.post('/users', async (req, res) => {
       return res.status(400).send(req.body.Username + ' already exists');
     }
 
+    const hashedPassword = await bcrypt.hash(req.body.Password, 10);
+
     const newUser = await Users.create({
       Username: req.body.Username,
-      Password: req.body.Password,
+      Password: hashedPassword,
       Email: req.body.Email,
       Birthday: req.body.Birthday // should be a date string
     });
@@ -79,7 +89,7 @@ app.post('/users', async (req, res) => {
 });
 
 //Update user info//
-app.put('/users/:username', async (req, res) => {
+app.put('/users/:username', passport.authenticate('jwt', { session: false}), async (req, res) => {
   try {
     const updatedUser = await Users.findOneAndUpdate(
       { Username: req.params.username },
@@ -103,7 +113,7 @@ app.put('/users/:username', async (req, res) => {
 });
 
 //Adds a film to the user's list of favorites; returns a confirmation message.//
-app.post('/users/:username/movies/:movieId', async (req, res) => {
+app.post('/users/:username/movies/:movieId', passport.authenticate('jwt', { session: false}), async (req, res) => {
   try {
     const updatedUser = await Users.findOneAndUpdate(
       { Username: req.params.username },
@@ -127,7 +137,7 @@ app.post('/users/:username/movies/:movieId', async (req, res) => {
 });
 
 //Removes a film from the user's list of favorites; returns a confirmation message.//
-app.delete('/users/:username/movies/:movieId', async (req, res) => {
+app.delete('/users/:username/movies/:movieId', passport.authenticate('jwt', { session: false}), async (req, res) => {
   try {
     const updatedUser = await Users.findOneAndUpdate(
       { Username: req.params.username },
@@ -151,7 +161,7 @@ app.delete('/users/:username/movies/:movieId', async (req, res) => {
 });
 
 //Deregisters an existing user; returns a confirmation message that the user has been removed.//
-app.delete('/users/:username', async (req, res) => {
+app.delete('/users/:username', passport.authenticate('jwt', { session: false}), async (req, res) => {
   try {
     const deletedUser = await Users.findOneAndDelete({ Username: req.params.username });
     if (!deletedUser) return res.status(404).send('User not found');
