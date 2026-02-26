@@ -1,10 +1,13 @@
-const passport = require('passport');
-require('./passport');
-
 const express = require('express');
 const app = express();
 
 app.use(express.json());
+
+const cors = require('cors');
+app.use(cors());
+
+const passport = require('passport');
+require('./passport');
 
 let auth = require('./auth')(app);
 
@@ -13,6 +16,8 @@ const Models = require('./models.js');
 
 const Movies = Models.Movie;
 const Users = Models.User;
+
+const { check, validationResult } = require('express-validator');
 
 const bcrypt = require('bcrypt');
 
@@ -65,28 +70,45 @@ app.get('/directors/:name', passport.authenticate('jwt', { session: false}), asy
 });
 
 //Registers new user.//
-app.post('/users', async (req, res) => {
-  try {
-    const existingUser = await Users.findOne({ Username: req.body.Username });
-    if (existingUser) {
-      return res.status(400).send(req.body.Username + ' already exists');
+app.post(
+  '/users',
+  [
+    check('Username', 'Username is required').notEmpty(),
+    check('Username', 'Username must be at least 5 characters').isLength({ min: 5 }),
+    check('Password', 'Password is required').notEmpty(),
+    check('Email', 'Email is invalid').isEmail()
+  ],
+  async (req, res) => {
+  
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
     }
 
-    const hashedPassword = await bcrypt.hash(req.body.Password, 10);
+    try {
+      const existingUser = await Users.findOne({ Username: req.body.Username });
+      if (existingUser) {
+        return res.status(400).send(req.body.Username + ' already exists');
+      }
 
-    const newUser = await Users.create({
-      Username: req.body.Username,
-      Password: hashedPassword,
-      Email: req.body.Email,
-      Birthday: req.body.Birthday // should be a date string
-    });
+      let hashedPassword = Users.hashPassword(req.body.Password);
 
-    res.status(201).json(newUser);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error: ' + err);
+      const newUser = await Users.create({
+        Username: req.body.Username,
+        Password: hashedPassword,
+        Email: req.body.Email,
+        Birthday: req.body.Birthday
+      });
+
+      return res.status(201).json(newUser);
+
+    } catch (err) {
+      console.error(err);
+      return res.status(500).send('Error: ' + err);
+    }
   }
-});
+);
+
 
 //Update user info//
 app.put('/users/:username', passport.authenticate('jwt', { session: false}), async (req, res) => {
